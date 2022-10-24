@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ToDoListAPI.Src.Contextos;
+using ToDoListAPI.Src.Repositorios;
+using ToDoListAPI.Src.Repositorios.Implementacoes;
 
 namespace ToDoListAPI
 {
@@ -30,8 +32,13 @@ namespace ToDoListAPI
             services.AddDbContext<ToDoListContexto>(opt =>
             opt.UseSqlServer(Configuration["ConnectionStringsDev:DefaultConnection"]));
 
+            // Repositorios
+            services.AddScoped<ILista, ListaRepositorio>();
+
             // Controladores
+            services.AddCors();
             services.AddControllers();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
