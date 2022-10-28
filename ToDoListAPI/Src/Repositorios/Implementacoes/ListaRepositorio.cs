@@ -92,8 +92,18 @@ namespace ToDoListAPI.Src.Repositorios.Implementacoes
             //implementar exception
 
             var listaExistente = await PegarListaPeloIdAsync(lista.Id);
-            listaExistente.Task = lista.Task;
-            listaExistente.Status = lista.Status;
+
+            if ( lista.Task != null && !lista.Task.Equals("") )
+            {
+                listaExistente.Task = lista.Task;
+            }
+
+            if ( lista.Status != null )
+            {
+                listaExistente.Status = lista.Status;
+            }
+
+            
 
             _contexto.Listas.Update(listaExistente);
             await _contexto.SaveChangesAsync();

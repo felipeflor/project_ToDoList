@@ -72,7 +72,7 @@ namespace ToDoListAPI.Src.Controllers
             }
         }
 
-        [HttpDelete("deletar/idLista")]
+        [HttpDelete("deletar/{idLista}")]
         public async Task<ActionResult> DeletarLista([FromRoute] int idLista)
         {
             try
