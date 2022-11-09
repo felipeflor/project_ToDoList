@@ -37,6 +37,7 @@ namespace ToDoListAPI
 
             // Repositorios
             services.AddScoped<ILista, ListaRepositorio>();
+            services.AddScoped<IUsuario, UsuarioRepositorio>();
 
             // Controladores
             services.AddCors();
