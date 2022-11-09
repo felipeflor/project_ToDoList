@@ -23,6 +23,9 @@ namespace ToDoListAPI.Src.Modelos
         public string Task { get; set; }
         public bool Status { get; set; }
 
+        [ForeignKey("fk_usuario")]
+        public Usuario Criador { get; set; }
+
         #endregion
 
     }
