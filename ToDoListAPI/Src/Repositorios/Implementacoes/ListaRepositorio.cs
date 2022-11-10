@@ -43,7 +43,9 @@ namespace ToDoListAPI.Src.Repositorios.Implementacoes
         
         public async Task<List<Lista>> PegarTodaListaAsync()
         {
-            return await _contexto.Listas.ToListAsync();
+            return await _contexto.Listas
+                .Include(p => p.Criador)
+                .ToListAsync();
         }
 
         /// <summary>
@@ -56,7 +58,9 @@ namespace ToDoListAPI.Src.Repositorios.Implementacoes
         public async Task<Lista> PegarListaPeloIdAsync(int id)
         {
             if (!ExisteId(id)) throw new Exception("Id da lista não encontrado");
-            return await _contexto.Listas.FirstOrDefaultAsync( l => l.Id == id);
+            return await _contexto.Listas
+                .Include(p => p.Criador)
+                .FirstOrDefaultAsync( l => l.Id == id);
 
             //funções auxiliares
             bool ExisteId(int id)
@@ -72,13 +76,23 @@ namespace ToDoListAPI.Src.Repositorios.Implementacoes
         /// <para name="tema">Construtor para cadastrar lista</para>
         public async Task NovaListaAsync(Lista lista)
         {
+            if (!ExisteUsuarioId(lista.Criador.Id)) throw new Exception("Id do usuário não encontrado");
+
             await _contexto.Listas.AddAsync(
                 new Lista
                 {
                     Task = lista.Task,
-                    Status = lista.Status
+                    Status = lista.Status,
+                    Criador = await _contexto.Usuarios.FirstOrDefaultAsync(u => u.Id == lista.Criador.Id)
                 });
             await _contexto.SaveChangesAsync();
+
+            // funções auxiliares
+            bool ExisteUsuarioId(int id)
+            {
+                var auxiliar = _contexto.Usuarios.FirstOrDefault(u => u.Id == id);
+                return auxiliar != null;
+            }
         }
 
         /// <summary>
