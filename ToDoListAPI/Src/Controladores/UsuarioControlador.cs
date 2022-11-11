@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using ToDoListAPI.Src.Modelos;
 using ToDoListAPI.Src.Repositorios;
+using ToDoListAPI.Src.Servicos;
 
 namespace ToDoListAPI.Src.Controladores
 {
@@ -12,13 +15,15 @@ namespace ToDoListAPI.Src.Controladores
     {
         #region Atributos
         private readonly IUsuario _repositorio;
+        private readonly IAutenticacao _servicos;
         #endregion
 
 
         #region Construtores
-        public UsuarioControlador(IUsuario repositorio)
+        public UsuarioControlador(IUsuario repositorio, IAutenticacao servicos)
         {
             _repositorio = repositorio;
+            _servicos = servicos;
         }
         #endregion
 
@@ -33,12 +38,32 @@ namespace ToDoListAPI.Src.Controladores
             return Ok(usuario);
         }
 
-        [HttpPost]
+        [HttpPost("cadastrar")]
+        [AllowAnonymous]
         public async Task<ActionResult> NovoUsuarioAsync([FromBody] Usuario usuario)
         {
-            await _repositorio.NovoUsuarioAsync(usuario);
+            try
+            {
+                await _servicos.CriarUsuarioSemDuplicarAsync(usuario);
+                return Created($"api/Usuarios/email/{usuario.Email}", usuario);
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+        }
 
-            return Created($"api/Usuarios/{usuario.Email}", usuario);
+        [HttpPost("logar")]
+        [AllowAnonymous]
+        public async Task<ActionResult> LogarAsync([FromBody] Usuario usuario)
+        {
+            var auxiliar = await _repositorio.PegarUsuarioPeloEmailAsync(usuario.Email);
+            if (auxiliar == null) return Unauthorized(new { Mensagem = "E-mail invalida" });
+            if (auxiliar.Senha != _servicos.CodificarSenha(usuario.Senha))
+                return Unauthorized(new { Mensagem = "Senha invalida" });
+
+            var token = "Bearer " + _servicos.GerarToken(auxiliar);
+            return Ok(new { Usuario = auxiliar, Token = token });
         }
         #endregion
     }

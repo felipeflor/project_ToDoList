@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using ToDoListAPI.Src.Modelos;
@@ -24,6 +25,7 @@ namespace ToDoListAPI.Src.Controllers
 
         #region Métodos
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult> PegarTodaListaAsync()
         {
             var lista = await _repositorio.PegarTodaListaAsync();
@@ -32,6 +34,7 @@ namespace ToDoListAPI.Src.Controllers
         }
 
         [HttpGet("id/{idLista}")]
+        [Authorize]
         public async Task<ActionResult> PegarListaPeloPeloIdAsync([FromRoute] int idLista)
         {
             try
@@ -45,6 +48,7 @@ namespace ToDoListAPI.Src.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> NovaListaAsync([FromBody] Lista lista)
         {
             try
@@ -59,6 +63,7 @@ namespace ToDoListAPI.Src.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult> AtualizarListaAsync([FromBody] Lista lista)
         {
             try
@@ -73,6 +78,7 @@ namespace ToDoListAPI.Src.Controllers
         }
 
         [HttpDelete("deletar/{idLista}")]
+        [Authorize]
         public async Task<ActionResult> DeletarLista([FromRoute] int idLista)
         {
             try
